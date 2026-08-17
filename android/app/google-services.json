@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "29012124084",
+    "project_id": "piqo-7e44a",
+    "storage_bucket": "piqo-7e44a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29012124084:android:1d969938249bbcc38292e1",
+        "android_client_info": {
+          "package_name": "com.piqo.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqucl1gGd08vNNHRaJ-0fpUfLCnPjSeRk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

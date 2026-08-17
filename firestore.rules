@@ -1,0 +1,92 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Public profiles. Read is public (not just "if request.auth != null")
+    // because the registration flow checks username availability BEFORE the
+    // user is signed in — see UserService.checkIfUsernameInUse, called
+    // before FirebaseAuth.createUserWithEmailAndPassword.
+    // NOTE: the user document also stores `email`, which becomes publicly
+    // readable under this rule. If that's not acceptable, move the
+    // username check to a Cloud Function (admin SDK) or to after account
+    // creation instead of relaxing this rule.
+    match /users/{uid} {
+      allow read: if true;
+      allow create, update: if request.auth != null && request.auth.uid == uid;
+      allow delete: if false;
+    }
+
+    match /followers/{uid}/user-followers/{followerUid} {
+      allow read: if request.auth != null;
+      allow create, delete: if request.auth != null && request.auth.uid == followerUid;
+    }
+
+    match /following/{uid}/user-following/{targetUid} {
+      allow read: if request.auth != null;
+      allow create, delete: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /posts/{postId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+                    && request.auth.uid == request.resource.data.ownerUid;
+      allow delete: if request.auth != null
+                    && request.auth.uid == resource.data.ownerUid;
+      allow update: if false;
+
+      match /post-likes/{uid} {
+        allow read: if request.auth != null;
+        allow create, delete: if request.auth != null && request.auth.uid == uid;
+      }
+
+      match /post-comments/{commentId} {
+        allow read: if request.auth != null;
+        allow create: if request.auth != null
+                      && request.resource.data.uid == request.auth.uid;
+        allow delete: if request.auth != null
+                      && (request.auth.uid == resource.data.uid
+                          || request.auth.uid == resource.data.postOwnerUid);
+        allow update: if false;
+      }
+    }
+
+    // Written only by Cloud Functions (functions/index.js) via the admin
+    // SDK, which bypasses these rules entirely. Clients only ever read
+    // their own feed.
+    match /feeds/{uid}/user-feeds/{postId} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /notifications/{uid}/user-notifications/{notificationId} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null
+                    && request.resource.data.uid == request.auth.uid;
+      allow update: if false;
+    }
+
+    match /reports/{id}/post-reports/{uid} {
+      allow read, create: if request.auth != null && request.auth.uid == uid;
+      allow update, delete: if false;
+    }
+
+    match /reports/{id}/user-reports/{uid} {
+      allow read, create: if request.auth != null && request.auth.uid == uid;
+      allow update, delete: if false;
+    }
+
+    // Chat is written directly by both participants (no relay Cloud
+    // Function): sending a message writes into the sender's own top-level
+    // doc AND into the recipient's top-level doc under a subcollection
+    // named after the sender's uid (see ChatViewModel.uploadMessage /
+    // conversation "recent-messages" docs). So for any document at
+    // messages/{uid1}/{subcollection}/{docId}, the request is legitimate
+    // whenever the caller is either the top-level owner or the doc being
+    // written/read is keyed by their own uid.
+    match /messages/{uid1}/{subcollection}/{docId} {
+      allow read, write: if request.auth != null
+                         && (request.auth.uid == uid1 || request.auth.uid == docId);
+    }
+  }
+}

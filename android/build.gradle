@@ -1,0 +1,30 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            def androidExtension = project.extensions.getByName('android')
+            if (androidExtension.namespace == null) {
+                def manifest = new XmlSlurper().parse(project.file('src/main/AndroidManifest.xml'))
+                androidExtension.namespace = manifest.@package.text()
+            }
+        }
+    }
+}
+
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

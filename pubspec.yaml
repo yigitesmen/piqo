@@ -1,0 +1,49 @@
+name: piqo
+description: A new Flutter project.
+
+publish_to: 'none'
+
+version: 1.0.0+6
+
+environment:
+  sdk: ">=2.18.2 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  shared_preferences: ^2.3.2
+  cupertino_icons: ^1.0.2
+  provider: ^6.0.3
+  firebase_core: ^4.13.0
+  firebase_auth: ^6.5.7
+  cloud_firestore: ^6.8.0
+  firebase_storage: ^13.4.6
+  image_picker: ^1.2.3
+  flutter_svg: ^2.3.0
+  email_validator: ^3.0.0
+  fluttertoast: ^9.1.0
+  uuid: ^4.6.0
+  readmore: ^3.0.0
+  font_awesome_flutter: ^11.0.0
+  flutter_slidable: ^4.0.3
+  cached_network_image: ^3.2.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  ios: true
+  android: true
+  image_path: "assets/images/app_icon_1024.png"
+  adaptive_icon_foreground: "assets/images/icon_foreground.png"
+  adaptive_icon_background: "#D6293D"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/

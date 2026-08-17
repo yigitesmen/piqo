@@ -1,0 +1,20 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Profile and post images are shown throughout the app (feed, profile
+    // grids, comments, etc.) to any signed-in user, including users who
+    // don't own the image, so read is public. Filenames are random UUIDs
+    // (see StorageHelper.uploadImage) rather than uid-scoped paths, so
+    // write access can only be gated on being signed in, not on ownership.
+    match /profile_images/{imageId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /post_images/{imageId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}
